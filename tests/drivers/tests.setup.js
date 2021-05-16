@@ -7,8 +7,8 @@
 
 
 // Import Server Runner
-const startTestServer = require('../src/server').startServer;
-const mongoose = require('../src/server').mongoose;
+const startTestServer = require('../../src/server').startServer;
+const mongoose = require('../../src/server').mongoose;
 const dotenv = require('dotenv');
 
 mongoose.set('useCreateIndex', true);

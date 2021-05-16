@@ -1,12 +1,10 @@
 const { GraphQLServer } = require('graphql-yoga');
 const { importSchema } = require('graphql-import');
 const path = require('path');
-
+const { mergeSchemas, makeExecutableSchema }  = require('graphql-tools');
+const fs = require('fs');
 
 const dotenv = require('dotenv');       						// Environment variables
-
-const resolvers = require('../src/reslovers/resolvers');				// Resolvers
-
 
 dotenv.config();
 
@@ -20,23 +18,30 @@ const startTestServer = async () => {
 		port: 8080
 	}
 
+	// Combines all module schemas into one
+	const schemas = [];
+	const folders = fs.readdirSync(path.join(__dirname, "./modules"));
+	folders.forEach(folder => {
+		const resolvers = require(`./modules/${folder}/resolvers`);
+		const typeDefs = importSchema(path.join(__dirname, `./modules/${folder}/schema.graphql`));
+
+		schemas.push(makeExecutableSchema({
+			resolvers,
+			typeDefs
+		}));
+	});
 
 	/*
 	* ::::::::::::::::::::::::::::::: TEST DB INIT :::::::::::::::::::::::::::::::
 	* */
 
 
-
-
-	// Import Schema has relative pathing issues use(path)
-	const typeDefs = importSchema(path.join(__dirname, "../src/schemas/schema.graphql"));
-	const server = new GraphQLServer({typeDefs, resolvers});
+	const server = new GraphQLServer({ schema: mergeSchemas({ schemas }) });
 
 	await server.start(options, ({port}) => {
 		console.log(`[>>] Test Server is live on localhost port :: ${port}`);
 	});
 }
-
 
 
 module.exports = startTestServer;
