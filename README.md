@@ -16,17 +16,26 @@ Core components for building GraphQL APIS with test driven development.
 * `JS Variant` 
     * [Vanilla JS](https://www.javascript.com/)
     
-## Includes
+## Features
 
-* Testing
-    * jest
-    * Custom test server
+* Testing Framework/Skeleton
+    * Jest
+    * Custom test server client
 * User Authentication
     * Registration
-    * Login, 
-    * Oath, 
-    * Account management :: password resets, verification 
-* Dev, Test and prod configuration models
+    * Login 
+    * Oath 
+    * Session/Auth management
+      * Password resets
+      * Email verification
+      * Logout
+      * Cookie/Token expiry
+* Rate limiting
 * Schema modularisation
   * Unify/Merge schemas at run time
-* Health Checks
+* Database schema verification
+  * Yup
+* Modularised resolvers
+* Health check resolver
+* Dev, Test and prod configuration models
+* Server side routes
