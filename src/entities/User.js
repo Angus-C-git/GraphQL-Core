@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
  * @USER ENTITY DEFINITION
  * */
 const userSchema = new mongoose.Schema({
-	usrName: {
+	username: {
 		type: String,
 		required: true,
 		min: 6,
@@ -21,7 +21,15 @@ const userSchema = new mongoose.Schema({
 		required: true,
 		min: 6
 	},
-	createdDate: {
+	count: {
+		type: Number,
+		default: 0
+	},
+	verified: {
+		type: Boolean,
+		default: false
+	},
+	created: {
 		type: Date,
 		default: Date.now
 	}

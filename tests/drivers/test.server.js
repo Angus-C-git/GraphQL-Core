@@ -1,42 +1,33 @@
-const { GraphQLServer } = require('graphql-yoga');
-const { importSchema } = require('graphql-import');
-const path = require('path');
-const { mergeSchemas, makeExecutableSchema }  = require('graphql-tools');
-const fs = require('fs');
+const { GraphQLServer } = require('graphql-yoga');				// GraphQLServer variant
 
 const dotenv = require('dotenv');       						// Environment variables
 
-dotenv.config();
+const genSchema = require('../../src/utils/genSchema');			// Generate Combined Schema
+const cookieParser = require('cookie-parser');					// Cookie Parser middleware
+const middleware = require('../../src/middleware/middleware');	// Auth/Global middleware
 
+dotenv.config();
 
 /*
 * ::::::::::::::::::::::::::::::: TEST SERVER INIT :::::::::::::::::::::::::::::::
 * */
 
 const startTestServer = async () => {
+	// Test server port conf
 	const options = {
 		port: 8080
 	}
 
-	// Combines all module schemas into one
-	const schemas = [];
-	const folders = fs.readdirSync(path.join(__dirname, "./modules"));
-	folders.forEach(folder => {
-		const resolvers = require(`./modules/${folder}/resolvers`);
-		const typeDefs = importSchema(path.join(__dirname, `./modules/${folder}/schema.graphql`));
-
-		schemas.push(makeExecutableSchema({
-			resolvers,
-			typeDefs
-		}));
+	const server = new GraphQLServer({
+		schema: genSchema(),
+		context: ({ request, response }) => ({
+			req: request, res: response
+		})
 	});
 
-	/*
-	* ::::::::::::::::::::::::::::::: TEST DB INIT :::::::::::::::::::::::::::::::
-	* */
-
-
-	const server = new GraphQLServer({ schema: mergeSchemas({ schemas }) });
+	// Apply cookie parser middleware
+	server.express.use(cookieParser());
+	server.express.use(middleware);
 
 	await server.start(options, ({port}) => {
 		console.log(`[>>] Test Server is live on localhost port :: ${port}`);
@@ -45,10 +36,3 @@ const startTestServer = async () => {
 
 
 module.exports = startTestServer;
-
-/* APOLLO CONFIG */
-
-// const server = new ApolloServer({ typeDefs, resolvers });
-// server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
-// 	console.log(`🚀 Server ready at ${url}`);
-// });

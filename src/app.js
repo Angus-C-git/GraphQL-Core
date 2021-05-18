@@ -1,7 +1,11 @@
 const startServer = require('./server').startServer;
+const connectDatabase = require('./utils/connectDatabase');
 
 // ::::::::::::::::::::::::: SERVER RUNNER ::::::::::::::::::::::::: \\
 
-startServer().then(() => {
-	console.log("[>>] Startup Complete");
+connectDatabase().then(() => {
+	startServer().then(() => {
+		console.log("[>>] Startup Complete");
+	});
 });
+

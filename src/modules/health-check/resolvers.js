@@ -1,4 +1,4 @@
-
+const User = require("../../entities/User");
 
 const resolvers = {
 	Query: {

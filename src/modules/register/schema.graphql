@@ -6,5 +6,5 @@ type Query {
 
 
 type Mutation {
-    register(email: String!, usrName: String!, password: String!): [Error!]
+    register(email: String!, username: String!, password: String!): [Error!]
 }

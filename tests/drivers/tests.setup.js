@@ -1,5 +1,5 @@
 /**
- * :::::::::::::::::::::::::::::::::::::::::: DRIVER FOR TESTS ::::::::::::::::::::::::::::::::::::::::::
+ * :::::::::::::::::::::::::::::::::::: DRIVER FOR TESTS ::::::::::::::::::::::::::::::::::::
  *
  *  -> Configures server instance and connection to TEST database.
  *  -> Provides cleaning utilities for db
@@ -10,6 +10,7 @@
 const startTestServer = require('../../src/server').startServer;
 const mongoose = require('../../src/server').mongoose;
 const dotenv = require('dotenv');
+const connectDatabase = require('../../src/utils/connectDatabase');
 
 mongoose.set('useCreateIndex', true);
 mongoose.promise = global.Promise;
@@ -24,7 +25,7 @@ async function removeAllCollections () {
 	}
 }
 
-// Currently unused
+// Currently unused --> drops database collections
 // async function dropAllCollections () {
 // 	const collections = Object.keys(mongoose.connection.collections);
 // 	for (const collectionName of collections) {
@@ -41,32 +42,20 @@ async function removeAllCollections () {
 // 	}
 // }
 
-module.exports = {
-	async runSetup () {
+module.exports = async function runSetup () {
 
-		await startTestServer().then(() => {
-			console.log("[>>] Test server setup completed");
-		});
+		// Only start the server if not already running
+		if (!process.env.TEST_SERVER_RUNNING) {
+			// init db connection to clean
+			await connectDatabase();
 
-		console.log("[>>] Cleaning DB ... ");
+			// init test server
+			await startTestServer().then(() => {
+				process.env.TEST_SERVER_RUNNING = 'true';
+				console.log("[>>] Test server setup completed");
+			});
+		}
+
+		console.log("\n[>>] Cleaning DB ... ");
 		await removeAllCollections();
-
-
-		// Connect to Mongoose
-		// beforeAll(async () => {
-		// 	console.log("HIT BEFORE");
-		// 	await removeAllCollections();
-		// });
-
-		// // Cleans up database between each test
-		// afterEach(async () => {
-		// 	await removeAllCollections();
-		// });
-
-		// Disconnect Mongoose
-		// afterAll(async () => {
-		// 	await dropAllCollections();
-		// 	await mongoose.connection.close();
-		// });
-	}
 }
